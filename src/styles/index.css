@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Design tokens */
+:root {
+  --card-bg: theme(colors.white);
+  --card-border: theme(colors.slate.200);
+}
+.dark {
+  --card-bg: theme(colors.slate.900);
+  --card-border: theme(colors.slate.800);
+}
+/* Khmer font when html lang=km */
+html[lang="km"],
+html[lang="km"] body {
+  font-family: "Siemreap", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, "Noto Sans Khmer", "Khmer OS", sans-serif;
+}
+
+/* Simple utility classes */
+.btn {
+  @apply inline-flex items-center justify-center px-3 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60;
+}
+.btn-outline {
+  @apply inline-flex items-center justify-center px-3 py-2 rounded border border-slate-300 text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800;
+}
+.btn-ghost {
+  @apply inline-flex items-center justify-center px-3 py-2 rounded text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800;
+}
+.input {
+  @apply border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+.card {
+  @apply rounded-lg border;
+  background-color: var(--card-bg);
+  border-color: var(--card-border);
+}
+.badge {
+  @apply inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border border-slate-300 text-slate-700 dark:border-slate-700 dark:text-slate-200;
+}
