@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../context/AuthContext";
+import { ROUTES } from "../../constants/routes";
 
 export default function LoginPage() {
   const { t } = useTranslation();
@@ -17,7 +18,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await login(form);
-      navigate("/");
+      navigate(ROUTES.dashboard, { replace: true });
     } catch (e) {
       setError(e?.response?.data?.message || t("auth.loginFailed"));
     } finally {

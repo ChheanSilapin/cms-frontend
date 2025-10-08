@@ -1,5 +1,8 @@
-import { BrowserRouter, Routes, Route} from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import { ROUTES, MENU } from "./constants/routes";
+import PageLayout from "./components/layout/PageLayout";
 import LoginPage from "./pages/Auth/LoginPage";
 import DashboardPage from "./pages/Dashboard/DashboardPage";
 import ProductManagementPage from "./pages/Products/ProductManagementPage";
@@ -13,7 +16,49 @@ import UserManagementPage from "./pages/Users/UserManagementPage";
 import RoleManagementPage from "./pages/Roles/RoleManagementPage";
 import PermissionManagementPage from "./pages/Permissions/PermissionManagementPage";
 
+function PrivateRoute({ children }) {
+  const { user, loading } = useAuth();
 
+  // Show loading state while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen grid place-items-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Redirect to login if not authenticated
+  if (!user) return <Navigate to={ROUTES.login} replace />;
+
+  // Render protected content
+  return <PageLayout menu={MENU}>{children}</PageLayout>;
+}
+
+function PublicRoute({ children }) {
+  const { user, loading } = useAuth();
+
+  // Show loading state while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen grid place-items-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Redirect to dashboard if already authenticated
+  if (user) return <Navigate to={ROUTES.dashboard} replace />;
+
+  // Render login page
+  return children;
+}
 
 export default function App() {
   return (
@@ -21,83 +66,99 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route
-            path={"/login"}
+            path={ROUTES.login}
             element={
+              <PublicRoute>
                 <LoginPage />
+              </PublicRoute>
             }
           />
           <Route
-            path={"/"}
+            path={ROUTES.dashboard}
             element={
+              <PrivateRoute>
                 <DashboardPage />
+              </PrivateRoute>
             }
           />
           <Route
-            path={"/products"}
+            path={ROUTES.products}
             element={
+              <PrivateRoute>
                 <ProductManagementPage />
+              </PrivateRoute>
             }
           />
           <Route
-            path={"/agents"}
+            path={ROUTES.agents}
             element={
+              <PrivateRoute>
                 <AgentManagementPage />
+              </PrivateRoute>
             }
           />
           <Route
-            path={"/customers"}
+            path={ROUTES.customers}
             element={
+              <PrivateRoute>
                 <CustomerManagementPage />
+              </PrivateRoute>
             }
           />
           <Route
-            path={"/teams"}
+            path={ROUTES.teams}
             element={
-
+              <PrivateRoute>
                 <TeamManagementPage />
-
+              </PrivateRoute>
             }
           />
           <Route
-            path={"/promotions"}
+            path={ROUTES.promotions}
             element={
-
+              <PrivateRoute>
                 <PromotionManagementPage />
-
+              </PrivateRoute>
             }
           />
           <Route
-            path={"/banks"}
+            path={ROUTES.banks}
             element={
-
+              <PrivateRoute>
                 <BankManagementPage />
-
+              </PrivateRoute>
             }
           />
           <Route
-            path={"/reports"}
+            path={ROUTES.reports}
             element={
-
+              <PrivateRoute>
                 <ReportPage />
-
+              </PrivateRoute>
             }
           />
           <Route
-            path={"/users"}
+            path={ROUTES.users}
             element={
+              <PrivateRoute>
                 <UserManagementPage />
+              </PrivateRoute>
             }
           />
           <Route
-            path={"/roles"}
+            path={ROUTES.roles}
             element={
+              <PrivateRoute>
                 <RoleManagementPage />
+              </PrivateRoute>
             }
           />
           <Route
-            path={"/permission"}
+            path={ROUTES.permissions}
             element={
+              <PrivateRoute>
                 <PermissionManagementPage />
+              </PrivateRoute>
             }
           />
         </Routes>
