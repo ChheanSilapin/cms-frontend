@@ -1,32 +1,46 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import * as authService from "../services/authService";
 
-const AuthCtx = createContext(null);
-export const useAuth = () => useContext(AuthCtx);
+const AuthContext = createContext(null);
+export const useAuth = () => useContext(AuthContext);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const t = localStorage.getItem("token");
-    const u = localStorage.getItem("user");
-    if (t) setToken(t);
-    if (u) setUser(JSON.parse(u));
-    setLoading(false);
+    const fetchUser = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+      try {
+        // Fetch fresh user data from backend
+        const userData = await authService.me();
+        setUser(userData);
+      } catch (error) {
+        console.error("Failed to fetch user:", error);
+        localStorage.removeItem("token");
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUser();
   }, []);
 
-  const login = async (credentials) => {
-    const res = await authService.login(credentials);
-    setToken(res.token);
-    setUser(res.user || { username: credentials.username });
-    localStorage.setItem("token", res.token);
-    localStorage.setItem(
-      "user",
-      JSON.stringify(res.user || { username: credentials.username })
-    );
-    return res;
+  const login = async (username, password) => {
+    const data = await authService.login({ username, password });
+    localStorage.setItem("token", data.access_token);
+    try {
+      const userData = await authService.me();
+      setUser(userData);
+    } catch (error) {
+      console.error("Failed to fetch user after login:", error);
+      setUser(data.user || { username });
+    }
+    return data;
   };
 
   const logout = async () => {
@@ -35,16 +49,20 @@ export function AuthProvider({ children }) {
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
-      setToken(null);
-      setUser(null);
       localStorage.removeItem("token");
-      localStorage.removeItem("user");
+      setUser(null);
+      window.location.href = "/login";
     }
   };
 
-  const value = useMemo(
-    () => ({ user, token, loading, login, logout }),
-    [user, token, loading]
+  const hasPermission = (permission) => {
+    if (!permission) return true;
+    return user?.permissions?.includes(permission) || false;
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, loading, login, logout, hasPermission }}>
+      {children}
+    </AuthContext.Provider>
   );
-  return <AuthCtx.Provider value={value}>{children}</AuthCtx.Provider>;
 }

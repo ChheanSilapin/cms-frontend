@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useTranslation } from "react-i18next";
+import { HiMenu } from "react-icons/hi";
+import { MdDarkMode, MdLightMode } from "react-icons/md";
+import { IoChevronDown } from "react-icons/io5";
 
 export default function Header({ onToggleSidebar }) {
   const { user, logout } = useAuth();
@@ -46,19 +49,7 @@ export default function Header({ onToggleSidebar }) {
           className="p-2 rounded hover:bg-gray-100 dark:hover:bg-slate-800"
           aria-label="Toggle sidebar"
         >
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          </svg>
+          <HiMenu className="w-5 h-5" />
         </button>
         <span className="font-semibold">CMS</span>
       </div>
@@ -78,13 +69,9 @@ export default function Header({ onToggleSidebar }) {
           aria-label="Toggle dark mode"
         >
           {dark ? (
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 1 0 9.79 9.79z" />
-            </svg>
+            <MdDarkMode className="w-5 h-5" />
           ) : (
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.8 1.42-1.42zM1 13h3v-2H1v2zm10-9h2V1h-2v3zm7.04 1.46l1.79-1.8-1.41-1.41-1.8 1.79 1.42 1.42zM17 13h3v-2h-3v2zM4.96 18.54l-1.79 1.8 1.41 1.41 1.8-1.79-1.42-1.42zM11 23h2v-3h-2v3zm7.04-4.46l1.8 1.79 1.41-1.41-1.79-1.8-1.42 1.42z" />
-            </svg>
+            <MdLightMode className="w-5 h-5" />
           )}
         </button>
         <div className="relative">
@@ -92,24 +79,13 @@ export default function Header({ onToggleSidebar }) {
             onClick={() => setShowUserMenu(!showUserMenu)}
             className="flex items-center gap-2 text-sm hover:bg-gray-100 dark:hover:bg-slate-800 rounded px-2 py-1"
           >
-            <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-slate-700 grid place-items-center text-blue-600 dark:text-blue-300 font-medium">
-              {(user?.username || user?.name || "U")[0].toUpperCase()}
-            </div>
+            
             <div className="hidden md:block text-left">
-              <div className="text-xs text-gray-600 dark:text-gray-300">
-                {user?.username || user?.name || "User"}
+              <div className="text-md text-gray-600 dark:text-gray-300">
+                {user.username}
               </div>
-              <div className="text-[10px] text-gray-400">Admin</div>
             </div>
-            <svg
-              className="w-4 h-4 text-gray-400"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M6 9l6 6 6-6" />
-            </svg>
+            <IoChevronDown className="w-4 h-4 text-gray-400" />
           </button>
           {showUserMenu && (
             <>

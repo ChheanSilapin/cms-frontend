@@ -1,7 +1,12 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
-import { ROUTES, MENU } from "./constants/routes";
 import PageLayout from "./components/layout/PageLayout";
 import LoginPage from "./pages/Auth/LoginPage";
 import DashboardPage from "./pages/Dashboard/DashboardPage";
@@ -15,153 +20,118 @@ import ReportPage from "./pages/Reports/ReportPage";
 import UserManagementPage from "./pages/Users/UserManagementPage";
 import RoleManagementPage from "./pages/Roles/RoleManagementPage";
 import PermissionManagementPage from "./pages/Permissions/PermissionManagementPage";
+import Unauthorized from "./pages/Unauthorized";
+import NotFoundPage from "./pages/NotFoundPage";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { useEffect } from "react";
 
-function PrivateRoute({ children }) {
+function AppContent() {
   const { user, loading } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  // Show loading state while checking authentication
+  useEffect(() => {
+    // Redirect to dashboard if logged in and on login page
+    if (user && location.pathname === "/login") {
+      navigate("/", { replace: true });
+    }
+  }, [user, location.pathname, navigate]);
+
   if (loading) {
     return (
       <div className="min-h-screen grid place-items-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
-        </div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
       </div>
     );
   }
 
-  // Redirect to login if not authenticated
-  if (!user) return <Navigate to={ROUTES.login} replace />;
-
-  // Render protected content
-  return <PageLayout menu={MENU}>{children}</PageLayout>;
-}
-
-function PublicRoute({ children }) {
-  const { user, loading } = useAuth();
-
-  // Show loading state while checking authentication
-  if (loading) {
+  if (!user) {
     return (
-      <div className="min-h-screen grid place-items-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
-        </div>
-      </div>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="*" element={<Navigate to="/login" />} />
+      </Routes>
     );
   }
 
-  // Redirect to dashboard if already authenticated
-  if (user) return <Navigate to={ROUTES.dashboard} replace />;
-
-  // Render login page
-  return children;
+  return (
+    <PageLayout>
+      <Routes>
+        <Route path="/login" element={<Navigate to="/" />} />
+        <Route path="/403" element={<Unauthorized />} />
+        <Route path="/" element={<DashboardPage />} />
+        
+        <Route path="/products" element={
+          <ProtectedRoute permission="products:read">
+            <ProductManagementPage />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/agents" element={
+          <ProtectedRoute permission="agents:read">
+            <AgentManagementPage />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/customers" element={
+          <ProtectedRoute permission="customer:read">
+            <CustomerManagementPage />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/teams" element={
+          <ProtectedRoute permission="teams:read">
+            <TeamManagementPage />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/promotions" element={
+          <ProtectedRoute permission="promotions:read">
+            <PromotionManagementPage />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/banks" element={
+          <ProtectedRoute permission="banks:read">
+            <BankManagementPage />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/reports" element={
+          <ProtectedRoute permission="reportsread">
+            <ReportPage />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/users" element={
+          <ProtectedRoute permission="users:read">
+            <UserManagementPage />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/roles" element={
+          <ProtectedRoute permission="roles:read">
+            <RoleManagementPage />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/permissions" element={
+          <ProtectedRoute>
+            <PermissionManagementPage />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </PageLayout>
+  );
 }
 
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Routes>
-          <Route
-            path={ROUTES.login}
-            element={
-              <PublicRoute>
-                <LoginPage />
-              </PublicRoute>
-            }
-          />
-          <Route
-            path={ROUTES.dashboard}
-            element={
-              <PrivateRoute>
-                <DashboardPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path={ROUTES.products}
-            element={
-              <PrivateRoute>
-                <ProductManagementPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path={ROUTES.agents}
-            element={
-              <PrivateRoute>
-                <AgentManagementPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path={ROUTES.customers}
-            element={
-              <PrivateRoute>
-                <CustomerManagementPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path={ROUTES.teams}
-            element={
-              <PrivateRoute>
-                <TeamManagementPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path={ROUTES.promotions}
-            element={
-              <PrivateRoute>
-                <PromotionManagementPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path={ROUTES.banks}
-            element={
-              <PrivateRoute>
-                <BankManagementPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path={ROUTES.reports}
-            element={
-              <PrivateRoute>
-                <ReportPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path={ROUTES.users}
-            element={
-              <PrivateRoute>
-                <UserManagementPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path={ROUTES.roles}
-            element={
-              <PrivateRoute>
-                <RoleManagementPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path={ROUTES.permissions}
-            element={
-              <PrivateRoute>
-                <PermissionManagementPage />
-              </PrivateRoute>
-            }
-          />
-        </Routes>
+        <AppContent />
       </BrowserRouter>
     </AuthProvider>
   );

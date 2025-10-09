@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import Table from "../../components/organisms/Table";
-import userApi from "../../services/userService";
 
 export default function PermissionManagementPage(){
 

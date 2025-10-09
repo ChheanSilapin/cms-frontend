@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import Table from "../../components/organisms/Table";
 import Button from "../../components/atoms/Button";
-import userApi from "../../services/userService";
 
 export default function RoleManagementPage(){
   const columns=[

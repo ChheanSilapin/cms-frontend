@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import Table from "../../components/organisms/Table";
 import Button from "../../components/atoms/Button";
-import customerApi from "../../services/customerService";
-
 export default function CustomerManagementPage(){
 
   const columns=[

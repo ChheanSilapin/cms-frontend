@@ -1,9 +1,7 @@
 import api from "./api";
 
 export async function login({ username, password }) {
-  // Adjust endpoint to your backend
   const { data } = await api.post("/api/login", { username, password });
-  // Expecting { token, user }
   return data ?? { token: "dev-token", user: { username } };
 }
 

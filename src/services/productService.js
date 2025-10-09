@@ -1,4 +1,4 @@
-import { list, get, create, update, remove } from "./crudService";
+
 const base = "/api/products";
 export default {
   list: (params) => list(base, params),

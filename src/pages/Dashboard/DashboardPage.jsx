@@ -1,20 +1,17 @@
 import { useTranslation } from "react-i18next";
-import useApiData from "../../hooks/useApiData";
-import * as dashboard from "../../services/dashboardService";
 import StatCard from "../../components/molecules/StatCard";
 import ChartContainer from "../../components/organisms/ChartContainer";
 import Icon from "../../components/atoms/Icon";
 
 export default function DashboardPage() {
   const { t } = useTranslation();
-  const { data: stats, loading } = useApiData(dashboard.getSummary, []);
-  const chart = stats?.chart || [
+  const chart =  [
     { name: "Jan", khr: 0, usd: 0 },
     { name: "Feb", khr: 0, usd: 0 },
     { name: "Mar", khr: 0, usd: 0 },
   ];
-  const tx = stats?.transactions || { khr: 0, usd: 0 };
-  const ag = stats?.agent || { khr: 0, usd: 0 };
+  const tx = chart.transactions || { khr: 0, usd: 0 };
+  const ag = chart.agent || { khr: 0, usd: 0 };
 
   return (
     <div>
@@ -26,14 +23,14 @@ export default function DashboardPage() {
         <StatCard
           title={t("dashboard.totalCustomers")}
           subtitle={t("customers.totalCustomers")}
-          value={stats?.customers ?? 0}
+          value={chart.customers ?? 0}
           icon={<Icon name="users" className="w-5 h-5" />}
           tone="blue"
         />
         <StatCard
           title={t("dashboard.activeBanks")}
           subtitle={t("dashboard.totalBank")}
-          value={stats?.banks ?? 0}
+          value={chart.banks ?? 0}
           icon={<Icon name="bank" className="w-5 h-5" />}
           tone="emerald"
         />
@@ -81,7 +78,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {loading && <div className="text-sm text-gray-500 mt-2">Loading...</div>}
     </div>
   );
 }
